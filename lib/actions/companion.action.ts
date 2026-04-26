@@ -52,3 +52,16 @@ export const getAllCompanionsAction = async ({
 
   return companions;
 };
+
+export const getCompanionAction = async (companionId: string) => {
+  const supabase = createSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('companions')
+    .select()
+    .eq('id', companionId);
+
+  if (error) throw new Error(error.message);
+
+  return data[0];
+};
