@@ -31,9 +31,12 @@ export const getAllCompanionsAction = async ({
   subject,
   topic,
 }: GetAllCompanions) => {
+  const { userId } = await auth(); // 👈 get current user
   const supabase = createSupabaseClient();
 
-  let query = supabase.from('companions').select();
+  let query = supabase.from('companions').select(
+    `*, bookmarks!left(user_id)`, // 👈 left join bookmarks
+  );
 
   if (subject && topic) {
     query = query
@@ -51,7 +54,14 @@ export const getAllCompanionsAction = async ({
 
   if (error) throw new Error(error.message);
 
-  return companions;
+  // Map bookmarked field based on whether current user has bookmarked it
+  return companions.map((companion) => ({
+    ...companion,
+    bookmarked:
+      companion.bookmarks?.some(
+        (b: { user_id: string }) => b.user_id === userId,
+      ) ?? false,
+  }));
 };
 
 export const getCompanionAction = async (companionId: string) => {
@@ -86,7 +96,15 @@ export const getRecentSessionsAction = async (limit = 10) => {
 
   const { data, error } = await supabase
     .from('session_history')
-    .select(`companions:companion_id (*)`)
+    // .select(`companions:companion_id (*)`)
+    .select(
+      `companions:companion_id (
+      id,
+      name,
+      subject,
+      topic
+    )`,
+    )
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -99,7 +117,16 @@ export const getUserSessionsAction = async (userId: string, limit = 10) => {
   const supabase = createSupabaseClient();
   const { data, error } = await supabase
     .from('session_history')
-    .select(`companions:companion_id (*)`)
+    .select(
+      `
+    companions:companion_id (
+      id,
+      name,
+      subject,
+      topic
+    )
+  `,
+    )
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(limit);
