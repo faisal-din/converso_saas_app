@@ -1,7 +1,12 @@
 'use client';
 
+import {
+  addBookmarkAction,
+  removeBookmarkAction,
+} from '@/lib/actions/companion.action';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface CompanionCardProps {
   id: string;
@@ -22,9 +27,13 @@ const CompanionCard = ({
   color,
   bookmarked,
 }: CompanionCardProps) => {
-  const handleBookmark = () => {
-    // Implement bookmark toggle logic here
-    console.log(`Toggled bookmark for companion ${id}`);
+  const pathname = usePathname();
+  const handleBookmark = async () => {
+    if (bookmarked) {
+      await removeBookmarkAction(id, pathname);
+    } else {
+      await addBookmarkAction(id, pathname);
+    }
   };
 
   return (
