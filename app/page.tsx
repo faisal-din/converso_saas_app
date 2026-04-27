@@ -2,6 +2,11 @@ import CompanionCard from '@/components/CompanionCard';
 import CompanionsList from '@/components/CompanionsList';
 import CTA from '@/components/CTA';
 import { recentSessions } from '@/constants';
+import {
+  getAllCompanionsAction,
+  getRecentSessionsAction,
+} from '@/lib/actions/companion.action';
+import { getSubjectColor } from '@/lib/utils';
 
 const companions = [
   {
@@ -34,6 +39,9 @@ const companions = [
 ];
 
 const Page = async () => {
+  const companions = await getAllCompanionsAction({ limit: 3 });
+  const recentSessionsCompanions = await getRecentSessionsAction(10);
+
   return (
     <main>
       <h1>Popular Companions</h1>
@@ -43,7 +51,7 @@ const Page = async () => {
           <CompanionCard
             key={companion.id}
             {...companion}
-            color={companion.color}
+            color={getSubjectColor(companion.subject)}
           />
         ))}
       </section>
@@ -51,7 +59,7 @@ const Page = async () => {
       <section className='home-section'>
         <CompanionsList
           title='Recently completed sessions'
-          companions={recentSessions}
+          companions={recentSessionsCompanions}
           classNames='w-2/3 max-lg:w-full'
         />
         <CTA />
