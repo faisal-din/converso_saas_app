@@ -7,6 +7,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface CompanionCardProps {
   id: string;
@@ -31,8 +32,10 @@ const CompanionCard = ({
   const handleBookmark = async () => {
     if (bookmarked) {
       await removeBookmarkAction(id, pathname);
+      toast.success('Bookmark removed');
     } else {
       await addBookmarkAction(id, pathname);
+      toast.success('Bookmark added');
     }
   };
 
