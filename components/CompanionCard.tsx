@@ -32,10 +32,8 @@ const CompanionCard = ({
   const handleBookmark = async () => {
     if (bookmarked) {
       await removeBookmarkAction(id, pathname);
-      toast.success('Bookmark removed');
     } else {
       await addBookmarkAction(id, pathname);
-      toast.success('Bookmark added');
     }
   };
 
